@@ -124,7 +124,7 @@ def preprocess(
     sources,
     tokenizer: transformers.PreTrainedTokenizer,
     max_len: int,
-    system_message: str = "You are a helpful assistant."
+    default_system_message: str = "You are a helpful assistant."
 ) -> Dict:
     roles = {"user": "<|im_start|>user", "assistant": "<|im_start|>assistant"}
 
@@ -142,6 +142,10 @@ def preprocess(
             source = source[1:]
 
         input_id, target = [], []
+        if "system_message" in source:
+            system_message = source["system_message"]
+        else:
+            system_message = default_system_message
         system = [im_start] + _system + tokenizer(system_message).input_ids + [im_end] + nl_tokens
         input_id += system
         target += [im_start] + [IGNORE_TOKEN_ID] * (len(system)-3) + [im_end] + nl_tokens
